@@ -59,7 +59,7 @@ footer{margin-top:22px;display:flex;justify-content:center;gap:10px;flex-wrap:wr
 @media (max-width:560px){.wrap{padding:18px 8px 50px}.h{font-size:13px}.subn{font-size:14px}select{font-size:13px;padding:5px 4px;max-width:110px}td{padding:9px 6px}th{padding:4px 7px}.name{font-size:15px}td:first-child{width:30px}.acts{flex-direction:column}}
 </style></head><body><div id="app"></div><script id="main">
 (function(){
-var PASS='1448';
+var PASS='',PH=2085875372,GAS='https://script.google.com/macros/s/AKfycbxm5rkfoPtV_YgpnDuMndUYoIGwXL1CgGltpnYPjcn25-KjQY2iua1lqXxRrZuRmYSnyw/exec',GVER=0,sv2=false,pend2=false;function hsh(s){var h=5381;for(var i=0;i<s.length;i++)h=((h*33)^s.charCodeAt(i))>>>0;return h;}function loadData2(){function loc(){return fetch('data.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();});}return fetch(GAS+'?t='+Date.now()).then(function(r){return r.json();}).then(function(j){GVER=j.ver||0;return j.data||loc();}).catch(loc);}function save2(){render();if(sv2){pend2=true;return;}sv2=true;toast('جارٍ الحفظ…');fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({pass:PASS,ver:GVER,data:ST})}).then(function(r){return r.json();}).then(function(j){sv2=false;if(j.ok){GVER=j.ver;if(pend2){pend2=false;save2();}else toast('تم الحفظ');}else{pend2=false;if(j.err==='conflict'){toast('عُدّل الجدول من جهاز آخر — حُمّلت آخر نسخة، أعد تعديلك',true);loadData2().then(function(s){ST=s;roll();render();});}else if(j.err==='pass'){ADMIN=false;render();toast('الرمز غير صحيح',true);}else toast('تعذّر الحفظ',true);}}).catch(function(){sv2=false;pend2=false;toast('تعذّر الحفظ، تحقق من الاتصال',true);});}
 var ST=null,SHA=null;
 var ART=null, ADMIN=false;
 try{var rs=+sessionStorage.getItem('dhf_resume')||0;ADMIN=Date.now()-rs<120000;sessionStorage.removeItem('dhf_resume');sessionStorage.removeItem('dhf_admin');}catch(e){}
@@ -69,7 +69,7 @@ function b64dec(c){return decodeURIComponent(escape(atob(c.replace(/\s/g,''))));
 function b64enc(s){return btoa(unescape(encodeURIComponent(s)));}
 function getTok(){try{return (localStorage.getItem('dhf_gh_token')||'').replace(/[^\x21-\x7E]/g,'');}catch(e){return '';}}
 function setTok(v){try{if(v)localStorage.setItem('dhf_gh_token',v);else localStorage.removeItem('dhf_gh_token');}catch(e){}}
-function loadData(){
+function loadData(){return loadData2();}function loadData_old(){
   function local(){return fetch('data.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();});}
   if(!API)return local();
   var h={Accept:'application/vnd.github+json'},tk=getTok();if(tk)h.Authorization='Bearer '+tk;
@@ -147,7 +147,7 @@ var tt;function toast(m,bad){var t=document.querySelector('.toast');if(!t){t=doc
 function tokDlg(after){dialog('<h3>ربط الحفظ بـ GitHub</h3><p style="margin:0 0 8px;font-size:14px;color:var(--muted)">مرة واحدة على هذا الجهاز: الصق رمز الوصول (Token) الخاص بالمستودع.</p><div class="row"><input type="password" style="width:100%" placeholder="github_pat_..." dir="ltr"></div><div class="err"></div><div class="btns"><button class="pri" data-ok>حفظ</button><button data-close>إلغاء</button></div>',function(d,close){
   var inp=d.querySelector('input');inp.focus();d.querySelector('[data-ok]').onclick=function(){var v=inp.value.trim();if(!v){d.querySelector('.err').textContent='الصق الرمز';return;}v=v.replace(/[^\x21-\x7E]/g,'');if(!/^(github_pat_|ghp_)/.test(v)){d.querySelector('.err').textContent='هذا ليس رمز GitHub — يجب أن يبدأ بـ github_pat_';return;}setTok(v);close();after();};});}
 var saving=false,again=false;
-function save(){render();
+function save(){return save2();}function save_old(){render();
   if(!API){toast('الحفظ يعمل بعد رفع الصفحة على GitHub Pages',true);return;}
   var tk=getTok();if(!tk){tokDlg(save);return;}
   if(saving){again=true;return;}saving=true;toast('جارٍ الحفظ…');
@@ -162,7 +162,7 @@ function save(){render();
     else toast('تعذّر الحفظ ('+e+')',true);});}
 
 function loginDlg(){dialog('<h3>دخول المشرف</h3><div class="row"><input type="password" inputmode="numeric" maxlength="8" placeholder="الرمز" style="width:100%"></div><div class="err"></div><div class="btns"><button class="pri" data-ok>دخول</button><button data-close>إلغاء</button></div>',function(d,close){
-  var inp=d.querySelector('input');inp.focus();function go(){if(inp.value===PASS){ADMIN=true;close();render();}else d.querySelector('.err').textContent='الرمز غير صحيح';}
+  var inp=d.querySelector('input');inp.focus();function go(){if(hsh(inp.value)===PH){PASS=inp.value;ADMIN=true;close();render();}else d.querySelector('.err').textContent='الرمز غير صحيح';}
   d.querySelector('[data-ok]').onclick=go;inp.onkeydown=function(e){if(e.key==='Enter')go();};});}
 
 function delDlg(id){var s=ST.slots.filter(function(x){return x.id===id;})[0];if(!s)return;
