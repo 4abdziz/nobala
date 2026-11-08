@@ -135,7 +135,7 @@ function render(){
     h+='<tr class="'+st+'"><td>'+r.no+'</td><td>'+nm+'</td><td><div class="h"><bdi>'+hStr(r.date)+'</bdi></div><div class="g">'+gStr(r.date)+'</div></td><td>'+subc+'</td>'+
       (ADMIN?'<td><div class="acts">'+(s.type==='p'?'<button class="mini" data-ren="'+s.id+'">تعديل الاسم</button>':'<button class="mini" data-ren="'+s.id+'">تعديل النص</button>')+'<button class="mini danger" data-del="'+s.id+'">حذف</button>'+'</div></td>':'')+'</tr>';});
   h+=insRow(ST.slots.length);
-  h+='</tbody></table><footer>'+(ADMIN?'<button class="pri" data-act="logout">إنهاء التعديل</button>':'<button data-act="login">✎ تعديل الجدول</button>')+'</footer>';
+  h+='</tbody></table><footer>'+(ADMIN?'<button class="pri" data-act="logout">إنهاء التعديل</button><button data-act="tok">رمز GitHub</button>':'<button data-act="login">✎ تعديل الجدول</button>')+'</footer>';
   h+='<div class="note">لا ضيافة في العشر الأواخر من رمضان، ولا من ليلة العيد إلى رابع أيام عيدي الفطر والأضحى · عند انتهاء الدورة يبدأ جدول جديد تلقائياً بالترتيب الأساسي</div></div>';
   document.getElementById('app').innerHTML=h;
 }
@@ -152,14 +152,14 @@ function save(){render();
   var tk=getTok();if(!tk){tokDlg(save);return;}
   if(saving){again=true;return;}saving=true;toast('جارٍ الحفظ…');
   var h={Accept:'application/vnd.github+json',Authorization:'Bearer '+tk};
-  fetch(API+'?t='+Date.now(),{headers:h,cache:'no-store'}).then(function(r){if(r.status===401||r.status===403)throw 'auth';if(!r.ok)throw 'net';return r.json();}).then(function(j){
+  fetch(API+'?t='+Date.now(),{headers:h,cache:'no-store'}).then(function(r){if(r.status===401||r.status===403)throw 'auth';if(!r.ok)throw 'net'+r.status;return r.json();}).then(function(j){
     if(SHA&&j.sha!==SHA)throw 'conflict';
     return fetch(API,{method:'PUT',headers:h,body:JSON.stringify({message:'تحديث جدول الضيافة',content:b64enc(JSON.stringify(ST,null,1)),sha:j.sha})});
-  }).then(function(r){if(r.status===401||r.status===403)throw 'auth';if(!r.ok)throw 'net';return r.json();}).then(function(j){SHA=j.content.sha;saving=false;toast('تم الحفظ');if(again){again=false;save();}})
+  }).then(function(r){if(r.status===401||r.status===403)throw 'auth';if(!r.ok)throw 'net'+r.status;return r.json();}).then(function(j){SHA=j.content.sha;saving=false;toast('تم الحفظ');if(again){again=false;save();}})
   .catch(function(e){saving=false;again=false;
     if(e==='auth'){setTok('');toast('رمز GitHub غير صالح أو بلا صلاحية — أدخله من جديد',true);}
     else if(e==='conflict'){toast('عدّل أحدٌ الجدول من جهاز آخر — تم تحميل آخر نسخة، أعد تعديلك',true);loadData().then(function(s){ST=s;roll();render();});}
-    else toast('تعذّر الحفظ، تحقق من الاتصال',true);});}
+    else toast('تعذّر الحفظ ('+e+')',true);});}
 
 function loginDlg(){dialog('<h3>دخول المشرف</h3><div class="row"><input type="password" inputmode="numeric" maxlength="8" placeholder="الرمز" style="width:100%"></div><div class="err"></div><div class="btns"><button class="pri" data-ok>دخول</button><button data-close>إلغاء</button></div>',function(d,close){
   var inp=d.querySelector('input');inp.focus();function go(){if(inp.value===PASS){ADMIN=true;close();render();}else d.querySelector('.err').textContent='الرمز غير صحيح';}
@@ -211,7 +211,7 @@ document.addEventListener('change',function(e){var id=e.target.getAttribute&&e.t
     return;}
   setSub(id,v,'cancel');save();});
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('button');if(!b)return;
-  var a=b.getAttribute('data-act');if(a==='login')return loginDlg();if(a==='logout'){ADMIN=false;try{sessionStorage.removeItem('dhf_resume');}catch(x){}return render();}
+  var a=b.getAttribute('data-act');if(a==='login')return loginDlg();if(a==='tok')return tokDlg(function(){toast('تم حفظ الرمز');});if(a==='logout'){ADMIN=false;try{sessionStorage.removeItem('dhf_resume');}catch(x){}return render();}
   if(b.hasAttribute('data-ren'))return renDlg(b.getAttribute('data-ren'));if(b.hasAttribute('data-del'))return delDlg(b.getAttribute('data-del'));if(b.hasAttribute('data-ins'))return insDlg(parseInt(b.getAttribute('data-ins'),10));});
 document.getElementById('app').innerHTML='<div class="wrap" style="text-align:center;padding-top:80px;color:var(--muted)">جارٍ تحميل الجدول…</div>';
 loadData().then(function(s){ST=s;roll();render();}).catch(function(){document.getElementById('app').innerHTML='<div class="wrap" style="text-align:center;padding-top:80px">تعذّر تحميل الجدول</div>';});
