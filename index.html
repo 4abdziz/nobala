@@ -67,7 +67,7 @@ var GH=(function(){var m=location.hostname.match(/^([^.]+)\.github\.io$/i);if(!m
 var API=GH?'https://api.github.com/repos/'+GH.o+'/'+GH.r+'/contents/data.json':null;
 function b64dec(c){return decodeURIComponent(escape(atob(c.replace(/\s/g,''))));}
 function b64enc(s){return btoa(unescape(encodeURIComponent(s)));}
-function getTok(){try{return localStorage.getItem('dhf_gh_token')||'';}catch(e){return '';}}
+function getTok(){try{return (localStorage.getItem('dhf_gh_token')||'').replace(/[^\x21-\x7E]/g,'');}catch(e){return '';}}
 function setTok(v){try{if(v)localStorage.setItem('dhf_gh_token',v);else localStorage.removeItem('dhf_gh_token');}catch(e){}}
 function loadData(){
   function local(){return fetch('data.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();});}
