@@ -145,7 +145,7 @@ function dialog(html,mount){var ov=document.createElement('div');ov.className='o
 var tt;function toast(m,bad){var t=document.querySelector('.toast');if(!t){t=document.createElement('div');document.body.appendChild(t);}t.className='toast'+(bad?' bad':'');t.textContent=m;clearTimeout(tt);tt=setTimeout(function(){t.remove();},bad?5000:2500);}
 
 function tokDlg(after){dialog('<h3>ربط الحفظ بـ GitHub</h3><p style="margin:0 0 8px;font-size:14px;color:var(--muted)">مرة واحدة على هذا الجهاز: الصق رمز الوصول (Token) الخاص بالمستودع.</p><div class="row"><input type="password" style="width:100%" placeholder="github_pat_..." dir="ltr"></div><div class="err"></div><div class="btns"><button class="pri" data-ok>حفظ</button><button data-close>إلغاء</button></div>',function(d,close){
-  var inp=d.querySelector('input');inp.focus();d.querySelector('[data-ok]').onclick=function(){var v=inp.value.trim();if(!v){d.querySelector('.err').textContent='الصق الرمز';return;}setTok(v);close();after();};});}
+  var inp=d.querySelector('input');inp.focus();d.querySelector('[data-ok]').onclick=function(){var v=inp.value.trim();if(!v){d.querySelector('.err').textContent='الصق الرمز';return;}v=v.replace(/[^\x21-\x7E]/g,'');if(!/^(github_pat_|ghp_)/.test(v)){d.querySelector('.err').textContent='هذا ليس رمز GitHub — يجب أن يبدأ بـ github_pat_';return;}setTok(v);close();after();};});}
 var saving=false,again=false;
 function save(){render();
   if(!API){toast('الحفظ يعمل بعد رفع الصفحة على GitHub Pages',true);return;}
