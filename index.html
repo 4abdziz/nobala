@@ -135,7 +135,7 @@ function render(){
     h+='<tr class="'+st+'"><td>'+r.no+'</td><td>'+nm+'</td><td><div class="h"><bdi>'+hStr(r.date)+'</bdi></div><div class="g">'+gStr(r.date)+'</div></td><td>'+subc+'</td>'+
       (ADMIN?'<td><div class="acts">'+(s.type==='p'?'<button class="mini" data-ren="'+s.id+'">تعديل الاسم</button>':'<button class="mini" data-ren="'+s.id+'">تعديل النص</button>')+'<button class="mini danger" data-del="'+s.id+'">حذف</button>'+'</div></td>':'')+'</tr>';});
   h+=insRow(ST.slots.length);
-  h+='</tbody></table><footer>'+(ADMIN?'<button class="pri" data-act="logout">إنهاء التعديل</button><button data-act="tok">رمز GitHub</button>':'<button data-act="login">✎ تعديل الجدول</button>')+'</footer>';
+  h+='</tbody></table><footer>'+(ADMIN?'<button class="pri" data-act="logout">إنهاء التعديل</button>':'<button data-act="login">✎ تعديل الجدول</button>')+'</footer>';
   h+='<div class="note">لا ضيافة في العشر الأواخر من رمضان، ولا من ليلة العيد إلى رابع أيام عيدي الفطر والأضحى · عند انتهاء الدورة يبدأ جدول جديد تلقائياً بالترتيب الأساسي</div></div>';
   document.getElementById('app').innerHTML=h;
 }
